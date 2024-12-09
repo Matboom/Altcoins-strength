@@ -1,0 +1,31 @@
+//@version=5
+indicator("Altcoins strength relative to Bitcoin", overlay=false, scale=scale.left)
+
+// Pobieranie danych
+total3 = request.security("CRYPTOCAP:TOTAL3", timeframe.period, close)
+usdc = request.security("CRYPTOCAP:USDC", timeframe.period, close)
+usdt = request.security("CRYPTOCAP:USDT", timeframe.period, close)
+btc = request.security("CRYPTOCAP:BTC", timeframe.period, close)
+
+// Obliczanie wskaźnika
+custom_value = (total3 - (usdc + usdt)) / btc
+
+// Rysowanie poziomych linii
+hline_03 = hline(0.3, "Level 0.3", color=color.black, linestyle=hline.style_dotted, linewidth=1)
+hline_05 = hline(0.5, "Level 0.5", color=color.black, linestyle=hline.style_dotted, linewidth=1)
+hline_08 = hline(0.9, "Level 0.9", color=color.black, linestyle=hline.style_dotted, linewidth=1)
+
+// Wypełnianie tła między poziomami 0.3 i 0.9
+fill(hline_03, hline_08, color=color.new(color.purple, 95), title="Background Fill")
+
+// Rysowanie fioletowej ciągłej linii
+plot(custom_value, title="Custom Value", color=color.purple, linewidth=2)
+
+// Dodanie napisu na wykresie
+var label my_label = na
+if (na(my_label))
+    my_label := label.new(x=bar_index, y=na(custom_value) ? 0 : custom_value, text="value = (total3 - (usdc + usdt)) / btc", color=color.white, style=label.style_label_left, textcolor=color.black, size=size.normal)
+
+// Możesz dostosować pozycję napisu, np.:
+label.set_x(my_label, bar_index + 10)  // Wstawienie tekstu 10 świec w prawo
+label.set_y(my_label, custom_value)     // Pozycja w zależności od wartości custom_value
